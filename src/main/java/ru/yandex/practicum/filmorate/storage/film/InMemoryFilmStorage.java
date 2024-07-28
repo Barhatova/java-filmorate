@@ -32,7 +32,7 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Collection<Film> getAllFilms() {
-        if(films.isEmpty()) {
+        if (films.isEmpty()) {
             log.info("Список фильмов пуст");
             throw new NotFoundException("Список фильмов пуст");
         }
