@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -15,73 +16,60 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Film createFilm(Film film) {
-        log.info("Запрос на создание фильма {}", film);
         film.setId(id++);
         films.put(film.getId(), film);
-        log.info("Создание фильма прошло успешно {}", film);
         return film;
     }
 
     @Override
     public Film updateFilm(Film film) {
-        log.info("Запрос на обновление фильма {}", film);
         if (film.getId() == 0 || !films.containsKey(film.getId())) {
             throw new NotFoundException("Id пользователя должен быть указан");
         }
         films.put(film.getId(), film);
-        log.info("Обновление фильма прошло успешно {}", film);
         return film;
     }
 
     @Override
     public Collection<Film> getAllFilms() {
-        log.info("Запрос на получение списка всех фильмов");
-        if (films.isEmpty()) {
+        if(films.isEmpty()) {
             log.info("Список фильмов пуст");
             throw new NotFoundException("Список фильмов пуст");
         }
-        log.info("Получение списка всех фильмов прошло упешно");
         return films.values();
     }
 
     @Override
     public Optional<Film> getFilmId(long id) {
-        log.warn("Запрос на получение фильма по id {}", id);
         return Optional.ofNullable(films.get(id));
     }
 
     @Override
     public void addLike(long id, long userId) {
-        log.warn("Запрос на добавление лайка к фильму {} пользователем {}", id, userId);
         Film film = films.get(id);
-        List<Long> likeList = new ArrayList<>();
+        Set<Long> likeSet = new HashSet<>();
         if (film.getLikes() != null) {
-            likeList = film.getLikes();
+            likeSet = film.getLikes();
         }
-        likeList.add(userId);
-        film.setLikes(likeList);
-        log.warn("Добавление лайка к фильму {} пользователем {} прошло успешно", userId, id);
+        likeSet.add(userId);
+        film.setLikes(likeSet);
     }
 
     @Override
     public void deleteLike(long id, long userId) {
-        log.warn("Запрос на удаление лайка к фильму {} пользователем {}", id, userId);
         Film film = films.get(id);
-        List<Long> likeList;
+        Set<Long> likeSet;
         if (film.getLikes() == null) {
             return;
         } else {
-            likeList = film.getLikes();
+            likeSet = film.getLikes();
         }
-        likeList.remove(userId);
-        film.setLikes(likeList);
-        log.warn("Удаление лайка к фильму {} пользователем {} прошло успешно", userId, id);
+        likeSet.remove(userId);
+        film.setLikes(likeSet);
     }
 
     @Override
     public Collection<Film> getFilmsTop(long count) {
-        log.info("Запрос на получение списка популярных фильмов");
-        log.info("Получение списка популярных фильмов прошло упешно");
         return films.values().stream()
                 .sorted(new Comparator<Film>() {
                     @Override
@@ -98,5 +86,3 @@ public class InMemoryFilmStorage implements FilmStorage {
                 .collect(Collectors.toList());
     }
 }
-
-

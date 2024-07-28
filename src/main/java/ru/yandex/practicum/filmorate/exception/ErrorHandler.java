@@ -12,7 +12,7 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleException(final Exception e) {
-        log.warn("INTERNAL_SERVER_ERROR", e.getMessage());
+        log.error("INTERNAL_SERVER_ERROR", e.getMessage());
         return new ErrorResponse(e.getMessage());
     }
 

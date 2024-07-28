@@ -24,7 +24,7 @@ public class FilmService {
         log.info("Запрос на добавление фильма {}", film);
         filmValidate(film);
         film = filmStorage.createFilm(film);
-        log.info("Добавление фильма прошло упешно {}", film);
+        log.info("Добавлен фильм {}", film);
         return film;
     }
 
@@ -43,14 +43,48 @@ public class FilmService {
                 .duration(film.getDuration())
                 .build();
         filmStorage.updateFilm(oldFilm);
-        log.info("Обновление фильма прошло упешно {}", film);
+        log.info("Обновлен фильм {}", film);
         return film;
     }
 
     public Collection<Film> getAllFilms() {
-        log.info("Запрос на получение списка всех фильмов");
-        log.info("Получение списка всех фильмов прошло упешно");
+        log.info("Получение списка всех фильмов");
         return filmStorage.getAllFilms();
+    }
+
+    public void addLike(long id, long userId) {
+        getFilmId(id);
+        getUserId(userId);
+        log.info("Запрос на добавление лайка к фильму {} пользователем {}", id, userId);
+        filmStorage.addLike(id, userId);
+        log.info("Пользователь {} поставил лайк фильму {}", userId, id);
+    }
+
+    public void deleteLike(long id, long userId) {
+        getFilmId(id);
+        getUserId(userId);
+        log.info("Запрос на удаление лайка к фильму {} ползователем {}", id, userId);
+        filmStorage.deleteLike(id, userId);
+        log.info("Пользователь {} удалил лайк у фильма {}", userId, id);
+    }
+
+    public Collection<Film> getFilmsTop(long count) {
+        log.info("Запрос на получение списка популярных фильмов");
+        return filmStorage.getFilmsTop(count);
+    }
+
+    private void getFilmId(long id) {
+        if (filmStorage.getFilmId(id).isEmpty()) {
+            log.warn("Фильм с id {} не найден", id);
+            throw new NotFoundException("Фильм с id  " + id + " не найден");
+        }
+    }
+
+    private void getUserId(long id) {
+        if (userStorage.getUserId(id).isEmpty()) {
+            log.warn("Пользователь с id {} не найден", id);
+            throw new NotFoundException("Фильм с id " + id + " не найден");
+        }
     }
 
     private void filmValidate(Film film) {
@@ -71,45 +105,4 @@ public class FilmService {
             throw new ValidationException("Продолжительность фильма должна быть положительным числом");
         }
     }
-
-    private void getFilmId(long id) {
-        if (filmStorage.getFilmId(id).isEmpty()) {
-            log.warn("Запрос на получение фильма по id {}", id);
-            throw new NotFoundException("Фильм с id {}" + id + " не найден");
-        }
-    }
-
-    private void getUserId(long id) {
-        if (userStorage.getUserId(id).isEmpty()) {
-            log.warn("Запрос на получение пользователя по id {}" + id);
-            throw new NotFoundException("Пользователь с id {} " + id + " не найден");
-        }
-    }
-
-    public void addLike(long id, long userId) {
-        getFilmId(id);
-        getUserId(userId);
-        log.info("Запрос на добавление лайка к фильму {} пользователем {}", id, userId);
-        filmStorage.addLike(id, userId);
-        log.info("Добавление лайка к фильму {} пользователем {} прошло успешно", userId, id);
-    }
-
-    public void deleteLike(long id, long userId) {
-        getFilmId(id);
-        getUserId(userId);
-        log.info("Запрос на удаление лайка к фильму {} пользователем {}", id, userId);
-        filmStorage.deleteLike(id, userId);
-        log.info("Удаление лайка к фильму {} пользователем {} прошло успешно", userId, id);
-    }
-
-    public Collection<Film> getFilmsTop(long count) {
-        log.info("Запрос на получение списка популярных фильмов");
-        log.info("Получение списка популярных фильмов прошло упешно");
-        return filmStorage.getFilmsTop(count);
-    }
 }
-
-
-
-
-

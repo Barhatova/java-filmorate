@@ -8,7 +8,9 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @Slf4j
@@ -27,5 +29,5 @@ public class Film {
     @NotNull(message = "Длительность фильма не может быть пустой")
     private int duration;
     @NotNull(message = "Список лайков фильма не может быть пустым")
-    private List<Long> likes = new ArrayList<>();
+    private Set<Long> likes = new HashSet<>();
 }
