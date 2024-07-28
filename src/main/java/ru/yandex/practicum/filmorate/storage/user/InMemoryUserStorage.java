@@ -36,7 +36,7 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public Collection<User> getAllUsers() {
         log.info("Запрос на получение списка всех пользователей");
-        if(users.isEmpty()) {
+        if (users.isEmpty()) {
             log.info("Список пользователей пуст");
             throw new NotFoundException("Список пользователей пуст");
         }
