@@ -37,7 +37,6 @@ public class InMemoryFilmStorage implements FilmStorage {
     public Collection<Film> getAllFilms() {
         log.info("Запрос на получение списка всех фильмов");
         if(films.isEmpty()) {
-            log.info("Список фильмов пуст");
             throw new NotFoundException("Список фильмов пуст");
         }
         log.info("Получение списка всех фильмов прошло упешно");
