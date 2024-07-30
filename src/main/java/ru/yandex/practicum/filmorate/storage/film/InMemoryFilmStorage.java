@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
-
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -45,8 +44,8 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public void addLike(long id, long userId) {
-        Film film = films.get(id);
+    public void addLike(long filmId, long userId) {
+        Film film = films.get(filmId);
         Set<Long> likeSet = new HashSet<>();
         if (film.getLikes() != null) {
             likeSet = film.getLikes();
@@ -56,8 +55,8 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public void deleteLike(long id, long userId) {
-        Film film = films.get(id);
+    public void deleteLike(long filmId, long userId) {
+        Film film = films.get(filmId);
         Set<Long> likeSet;
         if (film.getLikes() == null) {
             return;

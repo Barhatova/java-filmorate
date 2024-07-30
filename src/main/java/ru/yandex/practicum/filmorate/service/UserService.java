@@ -61,22 +61,22 @@ public class UserService {
         }
     }
 
-    public void addFriend(long id, long friendId) {
-        log.info("Запрос на добавление в друзья пользователем {} пользователя {}", id, friendId);
-        checkId(id);
+    public void addFriend(long userId, long friendId) {
+        log.info("Запрос на добавление в друзья пользователем {} пользователя {}", userId, friendId);
+        checkId(userId);
         checkId(friendId);
-        userStorage.addFriend(id, friendId);
-        userStorage.addFriend(friendId, id);
-        log.info("Пользователь {} добавлен в друзья пользователя {}", id, friendId);
+        userStorage.addFriend(userId, friendId);
+        userStorage.addFriend(friendId, userId);
+        log.info("Пользователь {} добавлен в друзья пользователя {}", userId, friendId);
     }
 
-    public void deleteFriend(long id, long friendId) {
-        log.info("Запрос на удаление из друзей пользователем {} пользователя {}", id, friendId);
-        checkId(id);
+    public void deleteFriend(long userId, long friendId) {
+        log.info("Запрос на удаление из друзей пользователем {} пользователя {}", userId, friendId);
+        checkId(userId);
         checkId(friendId);
-        userStorage.deleteFriend(id, friendId);
-        userStorage.deleteFriend(friendId, id);
-        log.info("Пользователь {} удалил из друзей пользователя {}", id, friendId);
+        userStorage.deleteFriend(userId, friendId);
+        userStorage.deleteFriend(friendId, userId);
+        log.info("Пользователь {} удалил из друзей пользователя {}", userId, friendId);
     }
 
     public Set<User> getCommonFriends(long id, long otherId) {

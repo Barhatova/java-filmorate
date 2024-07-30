@@ -8,7 +8,6 @@ import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
-
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.Collection;
@@ -52,20 +51,20 @@ public class FilmService {
         return filmStorage.getAllFilms();
     }
 
-    public void addLike(long id, long userId) {
-        getFilmId(id);
+    public void addLike(long filmId, long userId) {
+        getFilmId(filmId);
         getUserId(userId);
-        log.info("Запрос на добавление лайка к фильму {} пользователем {}", id, userId);
-        filmStorage.addLike(id, userId);
-        log.info("Пользователь {} поставил лайк фильму {}", userId, id);
+        log.info("Запрос на добавление лайка к фильму {} пользователем {}", filmId, userId);
+        filmStorage.addLike(filmId, userId);
+        log.info("Пользователь {} поставил лайк фильму {}", userId, filmId);
     }
 
-    public void deleteLike(long id, long userId) {
-        getFilmId(id);
+    public void deleteLike(long filmId, long userId) {
+        getFilmId(filmId);
         getUserId(userId);
-        log.info("Запрос на удаление лайка к фильму {} ползователем {}", id, userId);
-        filmStorage.deleteLike(id, userId);
-        log.info("Пользователь {} удалил лайк у фильма {}", userId, id);
+        log.info("Запрос на удаление лайка к фильму {} пользователем {}", filmId, userId);
+        filmStorage.deleteLike(filmId, userId);
+        log.info("Пользователь {} удалил лайк у фильма {}", userId, filmId);
     }
 
     public Collection<Film> getFilmsTop(long count) {
@@ -73,10 +72,10 @@ public class FilmService {
         return filmStorage.getFilmsTop(count);
     }
 
-    private void getFilmId(long id) {
-        if (filmStorage.getFilmId(id).isEmpty()) {
-            log.warn("Фильм с id {} не найден", id);
-            throw new NotFoundException("Фильм с id  " + id + " не найден");
+    private void getFilmId(long filmId) {
+        if (filmStorage.getFilmId(filmId).isEmpty()) {
+            log.warn("Фильм с id {} не найден", filmId);
+            throw new NotFoundException("Фильм с id  " + filmId + " не найден");
         }
     }
 

@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
-
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -53,8 +52,8 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public void addFriend(long id, long friendId) {
-        User user = users.get(id);
+    public void addFriend(long userId, long friendId) {
+        User user = users.get(userId);
         Set<Long> friendSet;
         if (user.getFriends() == null) {
             friendSet = new HashSet<>();
@@ -66,14 +65,14 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public void deleteFriend(long id, long friendId) {
-        User user = users.get(id);
+    public void deleteFriend(long userId, long friendId) {
+        User user = users.get(userId);
         User friend = users.get(friendId);
         if (user.getFriends() == null) {
             return;
         }
         if (user == null || friend == null) {
-            log.warn("Пользователь с id {} не найден", id);
+            log.warn("Пользователь с id {} не найден", userId);
             throw new NotFoundException("Пользователь с таким id не найден");
         }
         Set<Long> friendSet1;
@@ -86,9 +85,9 @@ public class InMemoryUserStorage implements UserStorage {
         }
         friendSet1.remove(friendId);
         user.setFriends(friendSet1);
-        friendSet2.remove(id);
+        friendSet2.remove(userId);
         friend.setFriends(friendSet2);
-        log.info("Пользователь {} удалил из друзей пользователя {}", id, friendId);
+        log.info("Пользователь {} удалил из друзей пользователя {}", userId, friendId);
     }
 
     @Override
