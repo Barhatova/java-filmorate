@@ -1,44 +1,50 @@
 package ru.yandex.practicum.filmorate;
 
 import org.junit.jupiter.api.Test;
-import ru.yandex.practicum.filmorate.controller.UserController;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
+
 import java.time.LocalDate;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class UserControllerTest {
-
-    private final UserController controller = new UserController();
-    User user = new User();
+    private final UserService userService = new UserService(new InMemoryUserStorage());
 
     @Test
     void testNotEmptyEmail() {
-        user.setEmail("");
-        user.setName("Name");
-        user.setLogin("a");
-        user.setBirthday(LocalDate.parse("2000-01-01"));
-        assertThrows(ValidationException.class, () -> controller.create(user), "Электронная почта не может быть " +
+        User user = User.builder()
+                .email("")
+                .name("Name")
+                .login("a")
+                .birthday(LocalDate.parse("2000-01-01"))
+        .build();
+        assertThrows(ValidationException.class, () -> userService.createUser(user), "Электронная почта не может быть " +
                 "пустой и должна содержать символ @");
     }
 
     @Test
     void testNotEmptyLogin() {
-        user.setEmail("abc@yandex.ru");
-        user.setName("Name");
-        user.setLogin("");
-        user.setBirthday(LocalDate.parse("2000-01-01"));
-        assertThrows(ValidationException.class, () -> controller.create(user), "Логин не может быть пустым и " +
+        User user = User.builder()
+        .email("abc@yandex.ru")
+                .name("Name")
+                .login("")
+                .birthday(LocalDate.parse("2000-01-01"))
+        .build();
+        assertThrows(ValidationException.class, () -> userService.createUser(user), "Логин не может быть пустым и " +
                 "содержать пробелы");
     }
 
     @Test
     void testNotBirthdayIsFuture() {
-        user.setEmail("abc@yandex.ru");
-        user.setName("Name");
-        user.setLogin("a");
-        user.setBirthday(LocalDate.parse("3000-01-01"));
-        assertThrows(ValidationException.class, () -> controller.create(user), "Дата рождения не может быть в " +
+        User user = User.builder()
+                .email("abc@yandex.ru")
+                .name("Name")
+                .login("a")
+                .birthday(LocalDate.parse("3000-01-01"))
+        .build();
+        assertThrows(ValidationException.class, () -> userService.createUser(user), "Дата рождения не может быть в " +
                 "будущем");
     }
 }
