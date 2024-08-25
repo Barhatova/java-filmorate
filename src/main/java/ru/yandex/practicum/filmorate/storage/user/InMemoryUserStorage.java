@@ -107,8 +107,4 @@ public class InMemoryUserStorage implements UserStorage {
         return users.get(id).getFriends().stream()
                 .map(users::get).collect(Collectors.toSet());
     }
-
-    @Override
-    public void updateFriend(int id, int friendId) {
-    }
 }
