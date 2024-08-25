@@ -1,6 +1,9 @@
 package ru.yandex.practicum.filmorate;
 
+import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.service.FilmService;
@@ -10,8 +13,10 @@ import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 import java.time.LocalDate;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+@SpringBootTest
+@RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class FilmControllerTest {
-    private final FilmService filmService = new FilmService(new InMemoryFilmStorage(), new InMemoryUserStorage());
+    private final FilmService filmService;
 
     @Test
     void testNotEmptyName() {

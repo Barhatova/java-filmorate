@@ -10,8 +10,8 @@ import java.util.stream.Collectors;
 @Component
 @Slf4j
 public class InMemoryFilmStorage implements FilmStorage {
-    private final Map<Long, Film> films = new HashMap<>();
-    private long id = 1;
+    private final Map<Integer, Film> films = new HashMap<>();
+    private Integer id = 1;
 
     @Override
     public Film createFilm(Film film) {
@@ -39,24 +39,24 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Optional<Film> getFilmId(long id) {
+    public Optional<Film> getFilmById(int id) {
         return Optional.ofNullable(films.get(id));
     }
 
     @Override
-    public void addLike(long filmId, long userId) {
-        Film film = films.get(filmId);
+    public void addLike(int id, int userId) {
+        Film film = films.get(id);
         Set<Long> likeSet = new HashSet<>();
         if (film.getLikes() != null) {
             likeSet = film.getLikes();
         }
-        likeSet.add(userId);
+        likeSet.add((long) userId);
         film.setLikes(likeSet);
     }
 
     @Override
-    public void deleteLike(long filmId, long userId) {
-        Film film = films.get(filmId);
+    public void deleteLike(int id, int userId) {
+        Film film = films.get(id);
         Set<Long> likeSet;
         if (film.getLikes() == null) {
             return;
@@ -68,19 +68,19 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Collection<Film> getFilmsTop(long count) {
+    public Collection<Film> getFilmsTop(int count) {
         return films.values().stream()
-                .sorted(new Comparator<Film>() {
-                    @Override
-                    public int compare(Film o1, Film o2) {
-                        if (o1.getLikes() == null) {
-                            return o2.getLikes() == null ? 0 : 1;
-                        } else if (o2.getLikes() == null) {
-                            return -1;
-                        }
-                        return o2.getLikes().size() - o1.getLikes().size();
+            .sorted(new Comparator<Film>() {
+                @Override
+                public int compare(Film o1, Film o2) {
+                    if (o1.getLikes() == null) {
+                        return o2.getLikes() == null ? 0 : 1;
+                    } else if (o2.getLikes() == null) {
+                        return -1;
                     }
-                })
+                    return o2.getLikes().size() - o1.getLikes().size();
+                }
+            })
                 .limit(count)
                 .collect(Collectors.toList());
     }

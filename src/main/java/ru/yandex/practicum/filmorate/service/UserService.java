@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
@@ -8,14 +9,14 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import java.time.LocalDate;
 import java.util.Collection;
-import java.util.Set;
+import java.util.Optional;
 
 @Service
 @Slf4j
 public class UserService {
     private final UserStorage userStorage;
 
-    public UserService(UserStorage userStorage) {
+    public UserService(@Qualifier("userRepository") UserStorage userStorage) {
         this.userStorage = userStorage;
     }
 
@@ -31,11 +32,11 @@ public class UserService {
     }
 
     public User updateUser(User user) {
-        if (user.getId() == 0) {
-            throw new ValidationException("Id пользователя должен быть указан");
-        }
         userValidate(user);
         checkId(user.getId());
+        if (user.getId() == 0 || user.getId() == null) {
+            throw new ValidationException("Id пользователя должен быть указан");
+        }
         log.info("Запрос на обновление пользователя {}", user);
         User oldUser = userStorage.getUserId(user.getId()).get();
         oldUser = oldUser.toBuilder()
@@ -54,42 +55,55 @@ public class UserService {
         return userStorage.getAllUsers();
     }
 
-    public void checkId(long id) {
+    public void checkId(int id) {
         if (userStorage.getUserId(id).isEmpty()) {
             log.warn("Пользователь с ID {} не найден", id);
             throw new NotFoundException("Пользователь с id = " + id + " не найден");
         }
     }
 
-    public void addFriend(long userId, long friendId) {
-        log.info("Запрос на добавление в друзья пользователем {} пользователя {}", userId, friendId);
-        checkId(userId);
+    public void addFriend(int id, int friendId) {
+        log.info("Запрос на добавление в друзья пользователем {} пользователя {}", id, friendId);
+        checkId(id);
         checkId(friendId);
-        userStorage.addFriend(userId, friendId);
-        userStorage.addFriend(friendId, userId);
-        log.info("Пользователь {} добавлен в друзья пользователя {}", userId, friendId);
+        if (!friendReciprocity(id, friendId)) {
+            userStorage.addFriend(id, friendId);
+            userStorage.addFriend(friendId, id);
+        }
+        log.info("Пользователь {} добавлен в друзья пользователя {}", id, friendId);
     }
 
-    public void deleteFriend(long userId, long friendId) {
-        log.info("Запрос на удаление из друзей пользователем {} пользователя {}", userId, friendId);
-        checkId(userId);
+    public void deleteFriend(int id, int friendId) {
+        log.info("Запрос на удаление из друзей пользователем {} пользователя {}", id, friendId);
+        checkId(id);
         checkId(friendId);
-        userStorage.deleteFriend(userId, friendId);
-        userStorage.deleteFriend(friendId, userId);
-        log.info("Пользователь {} удалил из друзей пользователя {}", userId, friendId);
+        if (friendReciprocity(friendId, id)) {
+            userStorage.deleteFriend(id, friendId);
+            userStorage.deleteFriend(friendId, id);
+        }
+        log.info("Пользователь {} удалил из друзей пользователя {}", id, friendId);
     }
 
-    public Set<User> getCommonFriends(long id, long otherId) {
+    public Collection<User> getCommonFriends(int id, int otherId) {
         log.info("Запрос на получение списка общих друзей пользователей {} и {}", id, otherId);
         checkId(id);
         checkId(otherId);
         return userStorage.getCommonFriends(id, otherId);
     }
 
-    public Set<User> getAllFriends(long id) {
+    public Collection<User> getAllFriends(int id) {
         log.info("Запрос на получение списка друзей пользователя {}", id);
         checkId(id);
         return userStorage.getAllFriends(id);
+    }
+
+    public User getUserId(int id) {
+        Optional<User> userOptional = userStorage.getUserId(id);
+        if (userOptional.isEmpty()) {
+            log.error("Пользователь с ID {} не найден", id);
+            throw new NotFoundException("Пользователь с id = " + id + " не найден");
+        }
+        return userOptional.get();
     }
 
     private void userValidate(User user) {
@@ -110,5 +124,11 @@ public class UserService {
             log.warn("Дата рождения не может быть в будущем");
             throw new ValidationException("Дата рождения не может быть в будущем");
         }
+    }
+
+    public boolean friendReciprocity(int id, int friendId) {
+       /* checkId(id);
+        checkId(friendId);*/
+        return userStorage.getAllFriends(friendId).stream().anyMatch(user -> user.getId() == id);
     }
 }

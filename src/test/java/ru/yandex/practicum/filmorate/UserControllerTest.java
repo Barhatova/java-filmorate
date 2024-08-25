@@ -20,8 +20,8 @@ public class UserControllerTest {
                 .login("a")
                 .birthday(LocalDate.parse("2000-01-01"))
         .build();
-        assertThrows(ValidationException.class, () -> userService.createUser(user), "Электронная почта не может быть " +
-                "пустой и должна содержать символ @");
+        assertThrows(ValidationException.class, () -> userService.createUser(user), "Электронная почта не " +
+                "может быть держать символ @");
     }
 
     @Test

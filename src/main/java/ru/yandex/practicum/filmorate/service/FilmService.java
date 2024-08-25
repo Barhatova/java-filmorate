@@ -1,23 +1,41 @@
 package ru.yandex.practicum.filmorate.service;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.genre.GenreRepository;
+import ru.yandex.practicum.filmorate.storage.mpa.MpaRepository;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.Collection;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
-@RequiredArgsConstructor
 @Service
 @Slf4j
 public class FilmService {
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
+    private final MpaRepository mpaRepository;
+    private final GenreRepository genreRepository;
+
+    public FilmService(@Qualifier("filmRepository") FilmStorage filmStorage,
+                       @Qualifier("userRepository") UserStorage userStorage,
+                       MpaRepository mpaRepository,
+                       GenreRepository genreRepository) {
+        this.filmStorage = filmStorage;
+        this.userStorage = userStorage;
+        this.mpaRepository = mpaRepository;
+        this.genreRepository = genreRepository;
+    }
 
     public Film createFilm(Film film) {
         log.info("Запрос на добавление фильма {}", film);
@@ -28,13 +46,13 @@ public class FilmService {
     }
 
     public Film updateFilm(Film film) {
-        if (film.getId() == 0) {
-            throw new ValidationException("Id фильма должен быть указан");
-        }
         filmValidate(film);
         getFilmId(film.getId());
+        if (film.getId() == 0 || film.getId() == null) {
+            throw new ValidationException("Id фильма должен быть указан");
+        }
         log.info("Запрос на обновление фильма {}", film);
-        Film oldFilm = filmStorage.getFilmId(film.getId()).get();
+        Film oldFilm = filmStorage.getFilmById(film.getId()).get();
         oldFilm = oldFilm.toBuilder()
                 .name(film.getName())
                 .description(film.getDescription())
@@ -51,35 +69,49 @@ public class FilmService {
         return filmStorage.getAllFilms();
     }
 
-    public void addLike(long filmId, long userId) {
-        getFilmId(filmId);
+    public void addLike(int id, int userId) {
+        getFilmId(id);
         getUserId(userId);
-        log.info("Запрос на добавление лайка к фильму {} пользователем {}", filmId, userId);
-        filmStorage.addLike(filmId, userId);
-        log.info("Пользователь {} поставил лайк фильму {}", userId, filmId);
+        log.info("Запрос на добавление лайка к фильму {} пользователем {}", id, userId);
+        filmStorage.addLike(id, userId);
+        log.info("Пользователь {} поставил лайк фильму {}", userId, id);
     }
 
-    public void deleteLike(long filmId, long userId) {
-        getFilmId(filmId);
+    public void deleteLike(int id, int userId) {
+        getFilmId(id);
         getUserId(userId);
-        log.info("Запрос на удаление лайка к фильму {} пользователем {}", filmId, userId);
-        filmStorage.deleteLike(filmId, userId);
-        log.info("Пользователь {} удалил лайк у фильма {}", userId, filmId);
+        log.info("Запрос на удаление лайка к фильму {} пользователем {}", id, userId);
+        filmStorage.deleteLike(id, userId);
+        log.info("Пользователь {} удалил лайк у фильма {}", userId, id);
     }
 
-    public Collection<Film> getFilmsTop(long count) {
+    public Collection<Film> getFilmsTop(int count) {
         log.info("Запрос на получение списка популярных фильмов");
         return filmStorage.getFilmsTop(count);
     }
 
-    private void getFilmId(long filmId) {
-        if (filmStorage.getFilmId(filmId).isEmpty()) {
-            log.warn("Фильм с id {} не найден", filmId);
-            throw new NotFoundException("Фильм с id  " + filmId + " не найден");
+    public Film getFilmById(int id) {
+        Optional<Film> filmOptional = filmStorage.getFilmById(id);
+        if (filmOptional.isEmpty()) {
+            log.error("Фильм с ID {} не найден", id);
+            throw new NotFoundException("Фильм с id = " + id + " не найден");
+        }
+        return filmOptional.get();
+    }
+
+    private boolean checkingTheMpa(Film film) {
+        Set<Integer> mpaId = mpaRepository.getAllMpa().stream().map(Mpa::getId).collect(Collectors.toSet());
+        return (film.getMpa() == null || !mpaId.contains(film.getMpa().getId()));
+    }
+
+    private void getFilmId(int id) {
+        if (filmStorage.getFilmById(id).isEmpty()) {
+            log.warn("Фильм с id {} не найден", id);
+            throw new NotFoundException("Фильм с id  " + id + " не найден");
         }
     }
 
-    private void getUserId(long id) {
+    private void getUserId(int id) {
         if (userStorage.getUserId(id).isEmpty()) {
             log.warn("Пользователь с id {} не найден", id);
             throw new NotFoundException("Фильм с id " + id + " не найден");
@@ -102,6 +134,18 @@ public class FilmService {
         if (film.getDuration() <= 0) {
             log.warn("Продолжительность фильма должна быть положительным числом");
             throw new ValidationException("Продолжительность фильма должна быть положительным числом");
+        }
+        if (checkingTheMpa(film)) {
+            log.warn("Некорректно введен рейтинг фильма {}", film);
+            throw new ValidationException("Рейтинг фильма некорректен.");
+        }
+        if (film.getGenres() != null) {
+            Set<Integer> genresId = genreRepository.getAllGenres().stream().map(Genre::getId).collect(Collectors.toSet());
+            Set<Integer> filmsGenresId = film.getGenres().stream().map(Genre::getId).collect(Collectors.toSet());
+            if (!genresId.containsAll(filmsGenresId)) {
+                log.warn("Некорректно введен жанр фильма {}", film);
+                throw new ValidationException("Жанр фильма некорректен.");
+            }
         }
     }
 }

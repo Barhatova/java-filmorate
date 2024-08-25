@@ -1,10 +1,7 @@
 package ru.yandex.practicum.filmorate.model;
 
 import jakarta.validation.constraints.NotNull;
-import lombok.Builder;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -15,9 +12,11 @@ import java.util.Set;
 @Getter
 @Setter
 @Builder(toBuilder = true)
+@NoArgsConstructor
+@AllArgsConstructor
 public class User {
-    @NotNull(message = "id пользователя не может быть пустым")
-    private long id;
+    //@NotNull(message = "id пользователя не может быть пустым")
+    private Integer id;
     @NotNull(message = "Email не может быть пустым")
     private String email;
     @NotNull(message = "Логин не может быть пустым")
@@ -27,5 +26,5 @@ public class User {
     @NotNull(message = "Дата рождения пользователя не может быть пустой")
     private LocalDate birthday;
     @NotNull(message = "Список друзей пользователя не может быть пустым")
-    private Set<Long> friends = new HashSet<>();
+    private Set<Integer> friends = new HashSet<>();
 }

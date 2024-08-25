@@ -10,8 +10,8 @@ import java.util.stream.Collectors;
 @Component
 @Slf4j
 public class InMemoryUserStorage implements UserStorage {
-    private final Map<Long, User> users = new HashMap<>();
-    private long id = 1;
+    private final Map<Integer, User> users = new HashMap<>();
+    private Integer id = 1;
 
     @Override
     public User createUser(User user) {
@@ -39,12 +39,12 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public Optional<User> getUserId(long id) {
+    public Optional<User> getUserId(int id) {
         return Optional.ofNullable(users.get(id));
     }
 
     @Override
-    public void deleteUser(long id) {
+    public void deleteUser(int id) {
         if (getUserId(id).isEmpty() || getUserId(id) == null) {
             throw new NotFoundException("Пользователь с таким id не найден");
         }
@@ -52,9 +52,9 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public void addFriend(long userId, long friendId) {
-        User user = users.get(userId);
-        Set<Long> friendSet;
+    public void addFriend(int id, int friendId) {
+        User user = users.get(id);
+        Set<Integer> friendSet;
         if (user.getFriends() == null) {
             friendSet = new HashSet<>();
         } else {
@@ -65,18 +65,18 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public void deleteFriend(long userId, long friendId) {
-        User user = users.get(userId);
+    public void deleteFriend(int id, int friendId) {
+        User user = users.get(id);
         User friend = users.get(friendId);
         if (user.getFriends() == null) {
             return;
         }
         if (user == null || friend == null) {
-            log.warn("Пользователь с id {} не найден", userId);
+            log.warn("Пользователь с id {} не найден", id);
             throw new NotFoundException("Пользователь с таким id не найден");
         }
-        Set<Long> friendSet1;
-        Set<Long> friendSet2;
+        Set<Integer> friendSet1;
+        Set<Integer> friendSet2;
         if (user.getFriends() == null || friend.getFriends() == null) {
             throw new NotFoundException("Список друзей пользователя не найден");
         } else {
@@ -85,14 +85,14 @@ public class InMemoryUserStorage implements UserStorage {
         }
         friendSet1.remove(friendId);
         user.setFriends(friendSet1);
-        friendSet2.remove(userId);
+        friendSet2.remove(id);
         friend.setFriends(friendSet2);
-        log.info("Пользователь {} удалил из друзей пользователя {}", userId, friendId);
+        log.info("Пользователь {} удалил из друзей пользователя {}", id, friendId);
     }
 
     @Override
-    public Set<User> getCommonFriends(long id, long otherId) {
-        Set<Long> friends = users.get(otherId).getFriends();
+    public Set<User> getCommonFriends(int id, int otherId) {
+        Set<Integer> friends = users.get(otherId).getFriends();
         return users.get(id).getFriends().stream()
                 .filter(friends::contains)
                 .map(users::get)
@@ -100,11 +100,15 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public Set<User> getAllFriends(long id) {
+    public Set<User> getAllFriends(int id) {
         if (users.get(id).getFriends() == null) {
             return new HashSet<>();
         }
         return users.get(id).getFriends().stream()
                 .map(users::get).collect(Collectors.toSet());
+    }
+
+    @Override
+    public void updateFriend(int id, int friendId) {
     }
 }
