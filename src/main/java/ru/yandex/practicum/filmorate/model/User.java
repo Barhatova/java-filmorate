@@ -15,7 +15,6 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 public class User {
-    //@NotNull(message = "id пользователя не может быть пустым")
     private Integer id;
     @NotNull(message = "Email не может быть пустым")
     private String email;

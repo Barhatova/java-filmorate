@@ -6,10 +6,8 @@ import ru.yandex.practicum.filmorate.model.Film;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 

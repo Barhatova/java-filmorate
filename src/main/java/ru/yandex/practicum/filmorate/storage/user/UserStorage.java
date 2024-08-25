@@ -22,8 +22,6 @@ public interface UserStorage {
     Collection<User> getCommonFriends(int id, int otherId);
 
     Collection<User> getAllFriends(int id);
-
-    void updateFriend(int id, int friendId);
 }
 
 
