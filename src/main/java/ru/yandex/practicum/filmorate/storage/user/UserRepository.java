@@ -6,6 +6,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.BaseRepository;
+
 import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.Optional;
@@ -27,6 +28,8 @@ public class UserRepository extends BaseRepository<User> implements UserStorage 
             "WHERE user_id = ?";
     private static final String DELETE_FRIEND_QUERY = "DELETE FROM friends WHERE user_id = ? AND friend_id = ?";
     private static final String DELETE_USER_QUERY = "DELETE FROM users WHERE user_id = ?";
+    private static final String UPDATE_FRIEND_QUERY = "UPDATE friends SET user_id = ?, friend_id = ?" +
+            "WHERE user_id = ?";
 
     public UserRepository(JdbcTemplate jdbc, RowMapper<User> mapper) {
         super(jdbc, mapper);
@@ -87,5 +90,10 @@ public class UserRepository extends BaseRepository<User> implements UserStorage 
     @Override
     public Collection<User> getAllFriends(int id) {
         return findMany(GET_ALL_FRIENDS_QUERY, id);
+    }
+
+    @Override
+    public void updateFriend(int id, int friendId) {
+        update(UPDATE_FRIEND_QUERY, id, friendId);
     }
 }

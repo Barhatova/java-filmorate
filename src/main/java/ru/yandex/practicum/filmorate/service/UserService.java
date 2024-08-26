@@ -68,7 +68,8 @@ public class UserService {
         checkId(friendId);
         if (!friendReciprocity(id, friendId)) {
             userStorage.addFriend(id, friendId);
-            userStorage.addFriend(friendId, id);
+        } else {
+            throw new ValidationException("Пользователи уже дружат");
         }
         log.info("Пользователь {} добавлен в друзья пользователя {}", id, friendId);
     }
@@ -79,7 +80,6 @@ public class UserService {
         checkId(friendId);
         if (friendReciprocity(friendId, id)) {
             userStorage.deleteFriend(id, friendId);
-            userStorage.deleteFriend(friendId, id);
         }
         log.info("Пользователь {} удалил из друзей пользователя {}", id, friendId);
     }
