@@ -3,8 +3,6 @@ package ru.yandex.practicum.filmorate.model;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
-
-import java.time.Duration;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
