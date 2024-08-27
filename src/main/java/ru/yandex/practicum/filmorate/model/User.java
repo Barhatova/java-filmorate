@@ -14,7 +14,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class User {
     @NotNull(message = "id пользователя не может быть пустым")
-    private int id;
+    private Integer id;
     @NotNull(message = "Email не может быть пустым")
     private String email;
     @NotNull(message = "Логин не может быть пустым")
