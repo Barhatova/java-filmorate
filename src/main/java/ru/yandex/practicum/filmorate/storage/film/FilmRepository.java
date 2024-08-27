@@ -98,13 +98,13 @@ public class FilmRepository extends BaseRepository<Film> implements FilmStorage 
     }
 
     @Override
-    public void addLike(int id, int userId) {
-        update(INSERT_LIKES_QUERY, id, userId);
+    public void addLike(int filmId, int userId) {
+        update(INSERT_LIKES_QUERY, filmId, userId);
     }
 
     @Override
-    public void deleteLike(int id, int userId) {
-        update(REMOVE_LIKES_QUERY, id, userId);
+    public void deleteLike(int filmId, int userId) {
+        update(REMOVE_LIKES_QUERY, filmId, userId);
     }
 
     @Override

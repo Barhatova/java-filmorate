@@ -48,7 +48,7 @@ public class FilmService {
     public Film updateFilm(Film film) {
         filmValidate(film);
         getFilmId(film.getId());
-        if (film.getId() == 0 || film.getId() == null) {
+        if (film.getId() == 0) {
             throw new ValidationException("Id фильма должен быть указан");
         }
         log.info("Запрос на обновление фильма {}", film);
@@ -69,20 +69,20 @@ public class FilmService {
         return filmStorage.getAllFilms();
     }
 
-    public void addLike(int id, int userId) {
-        getFilmId(id);
+    public void addLike(int filmId, int userId) {
+        getFilmId(filmId);
         getUserId(userId);
-        log.info("Запрос на добавление лайка к фильму {} пользователем {}", id, userId);
-        filmStorage.addLike(id, userId);
-        log.info("Пользователь {} поставил лайк фильму {}", userId, id);
+        log.info("Запрос на добавление лайка к фильму {} пользователем {}", filmId, userId);
+        filmStorage.addLike(filmId, userId);
+        log.info("Пользователь {} поставил лайк фильму {}", userId, filmId);
     }
 
-    public void deleteLike(int id, int userId) {
-        getFilmId(id);
+    public void deleteLike(int filmId, int userId) {
+        getFilmId(filmId);
         getUserId(userId);
-        log.info("Запрос на удаление лайка к фильму {} пользователем {}", id, userId);
-        filmStorage.deleteLike(id, userId);
-        log.info("Пользователь {} удалил лайк у фильма {}", userId, id);
+        log.info("Запрос на удаление лайка к фильму {} пользователем {}", filmId, userId);
+        filmStorage.deleteLike(filmId, userId);
+        log.info("Пользователь {} удалил лайк у фильма {}", userId, filmId);
     }
 
     public Collection<Film> getFilmsTop(int count) {

@@ -17,8 +17,8 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Film {
-   // @NotNull(message = "id фильма не может быть пустым")
-    private Integer id;
+    @NotNull(message = "id фильма не может быть пустым")
+    int id;
     @NotNull(message = "Название фильма не может быть пустым")
     private String name;
     @NotNull(message = "Описание фильма не может быть пустым")
@@ -27,8 +27,6 @@ public class Film {
     private LocalDate releaseDate;
     @NotNull(message = "Длительность фильма не может быть пустой")
     private int duration;
-    @NotNull(message = "Список лайков фильма не может быть пустым")
-    private Set<Long> likes = new HashSet<>();
-    Mpa mpa;
-    List<Genre> genres;
+    private Mpa mpa;
+    private List<Genre> genres;
 }
