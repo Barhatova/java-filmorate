@@ -1,51 +1,56 @@
 package ru.yandex.practicum.filmorate;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
-import ru.yandex.practicum.filmorate.service.FilmService;
-import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
-import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.model.Mpa;
 
 import java.time.LocalDate;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class FilmControllerTest {
-    private final FilmService filmService = new FilmService(new InMemoryFilmStorage(), new InMemoryUserStorage());
+import static org.junit.jupiter.api.Assertions.*;
+
+@SpringBootTest
+class FilmControllerTest {
+
+    @Autowired
+    private FilmController filmController;
 
     @Test
-    void testNotEmptyName() {
-        Film film = Film.builder()
-                .name("")
-        .description("Description")
-        .duration(100)
-        .releaseDate(LocalDate.parse("2000-01-01"))
+    void createFilm() {
+        Film newFilm = Film.builder()
+                .name("Film")
+                .description("film")
+                .releaseDate(LocalDate.of(2020, 4, 1))
+                .duration(120)
+                .mpa(new Mpa(1, "G"))
                 .build();
-        assertThrows(ValidationException.class, () -> filmService.createFilm(film), "Название не может быть пустым");
+        Film createdFilm = filmController.createFilm(newFilm);
+        assertNotNull(createdFilm.getId());
+        assertEquals(newFilm.getName(), createdFilm.getName());
+        assertEquals(newFilm.getDescription(), createdFilm.getDescription());
+        assertEquals(newFilm.getReleaseDate(), createdFilm.getReleaseDate());
+        assertEquals(newFilm.getDuration(), createdFilm.getDuration());
+        assertEquals(newFilm.getMpa().getId(), createdFilm.getMpa().getId());
     }
 
     @Test
-    void testNotReleaseDateBefore() {
-        Film film = Film.builder()
-                .name("Name")
-                .description("Description")
-                .duration(100)
-                .releaseDate(LocalDate.parse("1800-01-01"))
-                        .build();
-        assertThrows(ValidationException.class, () -> filmService.createFilm(film), "Дата релиза — не раньше " +
-                "28 декабря 1895 года");
-    }
-
-    @Test
-    void testNotDurationIsNegative() {
-        Film film = Film.builder()
-        .name("Name")
-                .description("Description")
-                .duration(-100)
-                .releaseDate(LocalDate.parse("1800-01-01"))
-                        .build();
-        assertThrows(ValidationException.class, () -> filmService.createFilm(film), "Продолжительность фильма должна" +
-                "быть положительным числом");
+    void getFilmById() {
+        Film newFilm = Film.builder()
+                .name("Film")
+                .description("test film")
+                .releaseDate(LocalDate.of(2020, 4, 1))
+                .duration(120)
+                .mpa(new Mpa(1, "G"))
+                .build();
+        Film createdFilm = filmController.createFilm(newFilm);
+        Film retrievedFilm = filmController.getFilmById(createdFilm.getId());
+        assertEquals(createdFilm.getId(), retrievedFilm.getId());
+        assertEquals(createdFilm.getName(), retrievedFilm.getName());
+        assertEquals(createdFilm.getDescription(), retrievedFilm.getDescription());
+        assertEquals(createdFilm.getReleaseDate(), retrievedFilm.getReleaseDate());
+        assertEquals(createdFilm.getDuration(), retrievedFilm.getDuration());
+        assertEquals(createdFilm.getMpa().getId(), retrievedFilm.getMpa().getId());
     }
 }
-

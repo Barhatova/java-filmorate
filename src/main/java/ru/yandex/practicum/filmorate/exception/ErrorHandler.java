@@ -19,14 +19,14 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleNotFound(final NotFoundException e) {
-        log.warn("NOT_FOUND",  e.getMessage());
+        log.warn("NOT_FOUND", e.getMessage());
         return new ErrorResponse(e.getMessage());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleValidation(final ValidationException e) {
-        log.warn("BAD_REQUEST",  e.getMessage());
+        log.warn("BAD_REQUEST", e.getMessage());
         return new ErrorResponse(e.getMessage());
     }
 }

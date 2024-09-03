@@ -11,7 +11,6 @@ import java.util.Collection;
 @RestController
 @RequestMapping("/films")
 @Slf4j
-
 public class FilmController {
     private final FilmService filmService;
 
@@ -26,12 +25,12 @@ public class FilmController {
     }
 
     @PutMapping("/{id}/like/{userId}")
-    public void addLike(@PathVariable long id, @PathVariable long userId) {
+    public void addLike(@PathVariable int id, @PathVariable int userId) {
         filmService.addLike(id, userId);
     }
 
     @DeleteMapping("/{id}/like/{userId}")
-    public void deleteLike(@PathVariable long id, @PathVariable long userId) {
+    public void deleteLike(@PathVariable int id, @PathVariable int userId) {
         filmService.deleteLike(id, userId);
     }
 
@@ -41,7 +40,12 @@ public class FilmController {
     }
 
     @GetMapping("/popular")
-    public Collection<Film> getFilmsTop(@RequestParam(defaultValue = "10") long count) {
+    public Collection<Film> getFilmsTop(@RequestParam(defaultValue = "10") int count) {
         return filmService.getFilmsTop(count);
+    }
+
+    @GetMapping("/{id}")
+    public Film getFilmById(@PathVariable int id) {
+        return filmService.getFilmById(id);
     }
 }
